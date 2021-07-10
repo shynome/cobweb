@@ -1,6 +1,8 @@
 package tables
 
 import (
+	"fmt"
+
 	"github.com/GoAdminGroup/go-admin/context"
 	"github.com/GoAdminGroup/go-admin/modules/db"
 	form2 "github.com/GoAdminGroup/go-admin/plugins/admin/modules/form"
@@ -14,6 +16,7 @@ import (
 func GetV2rayUsersTable(ctx *context.Context) table.Table {
 
 	v2 := v2ray.FromContext(ctx.Request.Context())
+	orm := models.GetORM()
 
 	v2rayUsers := table.NewDefaultTable(table.DefaultConfigWithDriver("sqlite"))
 
@@ -26,15 +29,30 @@ func GetV2rayUsersTable(ctx *context.Context) table.Table {
 	info.AddField("Created_at", "created_at", db.Datetime)
 	info.AddField("Updated_at", "updated_at", db.Datetime)
 
+	info.SetPreDeleteFn(func(ids []string) (err error) {
+		var users []models.V2rayUser
+		if err = orm.Find(&users, ids).Error; err != nil {
+			return
+		}
+		fmt.Println(users)
+		for _, u := range users {
+			v2.RemoveUser(u.Username)
+		}
+		return
+	})
+
 	info.SetTable("v2ray_users").SetTitle("V2rayUsers").SetDescription("V2rayUsers")
 
 	formList := v2rayUsers.GetForm()
 	formList.AddField("Id", "id", db.Integer, form.Default).
 		FieldDisableWhenCreate().
 		FieldNotAllowEdit()
-	formList.AddField("Username", "username", db.Text, form.Text)
+	formList.AddField("Username", "username", db.Text, form.Text).
+		FieldMust()
 	_uuid := uuid.New()
-	formList.AddField("Uuid", "uuid", db.Text, form.Text).FieldDefault(_uuid.String())
+	formList.AddField("Uuid", "uuid", db.Text, form.Text).
+		FieldMust().
+		FieldDefault(_uuid.String())
 	formList.AddField("Created_at", "created_at", db.Datetime, form.Datetime).
 		FieldNowWhenInsert().
 		FieldNotAllowEdit()

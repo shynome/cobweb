@@ -7,16 +7,14 @@ import (
 	"github.com/shynome/cobweb/models"
 	"github.com/shynome/cobweb/v2ray/config"
 	_ "github.com/shynome/cobweb/v2ray/features"
-	"github.com/thoas/go-funk"
 	core "github.com/v2fly/v2ray-core/v4"
-	"github.com/v2fly/v2ray-core/v4/common/protocol"
 	"github.com/v2fly/v2ray-core/v4/features/inbound"
 	"github.com/v2fly/v2ray-core/v4/proxy"
 )
 
 type V2rayControl interface {
 	AddUser(user models.V2rayUser) error
-	RemoveUser(username string) error
+	RemoveUser(id string) error
 }
 
 type V2ray struct {
@@ -26,14 +24,7 @@ type V2ray struct {
 
 func New(users []models.V2rayUser) (v2 *V2ray, err error) {
 	v2 = &V2ray{}
-	pbusers := funk.Map(users, func(user models.V2rayUser) *protocol.User {
-		pu, err := config.ToUser(user)
-		if err != nil {
-			return nil
-		}
-		return pu
-	}).([]*protocol.User)
-	cfg := config.GenConfig(pbusers)
+	cfg := config.GenConfig()
 
 	server, err := core.New(cfg)
 	if err != nil {
@@ -46,6 +37,11 @@ func New(users []models.V2rayUser) (v2 *V2ray, err error) {
 		return
 	}
 	v2.um = um
+	for _, u := range users {
+		if err = v2.AddUser(u); err != nil {
+			return
+		}
+	}
 
 	return
 }
@@ -78,8 +74,8 @@ func (v2 *V2ray) AddUser(user models.V2rayUser) (err error) {
 	return v2.um.AddUser(context.Background(), u)
 }
 
-func (v2 *V2ray) RemoveUser(username string) (err error) {
-	return v2.um.RemoveUser(context.Background(), username)
+func (v2 *V2ray) RemoveUser(id string) (err error) {
+	return v2.um.RemoveUser(context.Background(), id)
 }
 
 var _ V2rayControl = &V2ray{}

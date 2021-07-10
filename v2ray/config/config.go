@@ -12,7 +12,7 @@ import (
 )
 
 // GenConfig expose v2ray config
-func GenConfig(users []*protocol.User) *core.Config {
+func GenConfig() *core.Config {
 
 	wsPath := "/ray"
 	wsPort := 3005
@@ -34,7 +34,7 @@ func GenConfig(users []*protocol.User) *core.Config {
 			},
 		}),
 		ProxySettings: serial.ToTypedMessage(&inbound.Config{
-			User: users,
+			User: []*protocol.User{},
 		}),
 	}
 
