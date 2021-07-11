@@ -35,6 +35,11 @@ func startServer() {
 	models.Init(eng.SqliteConnection())
 
 	orm := models.GetORM()
+
+	if err := models.Migrate(orm); err != nil {
+		log.Fatal(err)
+	}
+
 	var users []models.V2rayUser
 	if err := orm.Model(models.V2rayUser{}).Find(&users).Error; err != nil {
 		log.Fatal(err)

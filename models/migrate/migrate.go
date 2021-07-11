@@ -12,9 +12,7 @@ func main() {
 	orm := db.GetORM(&gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})
-	err := orm.AutoMigrate(
-		&models.V2rayUser{},
-	)
+	err := models.Migrate(orm)
 	if err != nil {
 		log.Fatal(err)
 	}
