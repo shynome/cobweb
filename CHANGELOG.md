@@ -1,3 +1,9 @@
+## v1.3.1
+
+### CHANGE
+
+- api 添加 GZIP 以减小 qrcode 的大小
+
 ## v1.3.0
 
 ### ADD
