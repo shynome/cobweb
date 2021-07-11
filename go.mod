@@ -20,6 +20,7 @@ require (
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/v2fly/v2ray-core/v4 v4.40.1
 	github.com/valyala/fasthttp v1.28.0 // indirect
+	github.com/wamuir/svg-qr-code v0.0.0-20210505095655-d815d7262f9d
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	github.com/yalp/jsonpath v0.0.0-20180802001716-5cc68e5049a0 // indirect
 	github.com/yudai/gojsondiff v1.0.0 // indirect

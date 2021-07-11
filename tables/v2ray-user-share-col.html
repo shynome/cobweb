@@ -1,0 +1,13 @@
+<span>{{ .uuid }}</span>
+<form action="/api/v2ray/share/qrcode" method="POST" target="_blank">
+  <input type="hidden" name="uuid" value="{{ .uuid }}">
+  <input type="submit" value="分享二维码">
+</form>
+<form action="/api/v2ray/share/link" method="POST" target="_blank">
+  <input type="hidden" name="uuid" value="{{ .uuid }}">
+  <input type="submit" value="分享链接">
+</form>
+<form action="/api/v2ray/share/vnext" method="POST" target="_blank">
+  <input type="hidden" name="uuid" value="{{ .uuid }}">
+  <input type="submit" value="未编码对象">
+</form>

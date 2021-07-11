@@ -15,13 +15,17 @@ func GetServerConfig() ServerConfig {
 		listen = ":3005"
 	}
 
-	v2url := os.Getenv("V2RAY_URL")
-	if v2url == "" {
-		v2url = "/ray"
-	}
-
+	v2url := getV2rayUrl()
 	return ServerConfig{
 		Listen:   listen,
 		V2rayUrl: v2url,
 	}
+}
+
+func getV2rayUrl() (v2url string) {
+	os.Getenv("V2RAY_URL")
+	if v2url == "" {
+		v2url = "/ray"
+	}
+	return
 }

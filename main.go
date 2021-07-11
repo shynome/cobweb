@@ -13,6 +13,7 @@ import (
 	"github.com/GoAdminGroup/go-admin/engine"
 	"github.com/labstack/echo/v4"
 
+	"github.com/shynome/cobweb/api"
 	"github.com/shynome/cobweb/config"
 	"github.com/shynome/cobweb/models"
 	"github.com/shynome/cobweb/pages"
@@ -46,6 +47,8 @@ func startServer() {
 		ws.ServerHTTP(c.Response().Writer, c.Request())
 		return nil
 	})
+
+	api.Register(e.Group("/api"))
 
 	e.Use(v2ray.InjectV2rayMiddleware(v2))
 	if err := eng.
