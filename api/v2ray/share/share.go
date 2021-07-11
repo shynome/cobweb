@@ -103,5 +103,6 @@ func genShareLink(c echo.Context, uuid string) (string, error) {
 		return "", err
 	}
 	link := base64.StdEncoding.EncodeToString(b)
+	link = "vmess://" + link
 	return link, nil
 }
