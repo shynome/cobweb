@@ -8,7 +8,7 @@ import (
 	"github.com/v2fly/v2ray-core/v4/common/serial"
 	"github.com/v2fly/v2ray-core/v4/proxy/vmess/inbound"
 	"github.com/v2fly/v2ray-core/v4/transport/internet"
-	"github.com/v2fly/v2ray-core/v4/transport/internet/websocket"
+	"github.com/shynome/cobweb/v2ray/websocket"
 )
 
 // GenConfig expose v2ray config

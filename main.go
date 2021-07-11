@@ -17,6 +17,7 @@ import (
 	"github.com/shynome/cobweb/pages"
 	"github.com/shynome/cobweb/tables"
 	"github.com/shynome/cobweb/v2ray"
+	ws "github.com/shynome/cobweb/v2ray/websocket"
 )
 
 func main() {
@@ -38,6 +39,10 @@ func startServer() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	e.Any("/ray", func(c echo.Context) error {
+		ws.ServerHTTP(c.Response().Writer, c.Request())
+		return nil
+	})
 
 	e.Use(v2ray.InjectV2rayMiddleware(v2))
 	if err := eng.
@@ -47,7 +52,7 @@ func startServer() {
 	}
 	eng.HTML("GET", "/admin", pages.GetDashBoard)
 
-	go func() { e.Logger.Fatal(e.Start(":3006")) }()
+	go func() { e.Logger.Fatal(e.Start(":3005")) }()
 	go func() {
 		if err := v2.Server.Start(); err != nil {
 			log.Fatal(err)

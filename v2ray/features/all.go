@@ -26,7 +26,7 @@ import (
 	_ "github.com/v2fly/v2ray-core/v4/proxy/vmess/inbound"
 
 	// Transports
-	_ "github.com/v2fly/v2ray-core/v4/transport/internet/websocket"
+	_ "github.com/shynome/cobweb/v2ray/websocket"
 
 	// Geo loaders
 	_ "github.com/v2fly/v2ray-core/v4/infra/conf/geodata/memconservative"

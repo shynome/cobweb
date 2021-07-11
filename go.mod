@@ -13,12 +13,11 @@ require (
 	github.com/gin-gonic/gin v1.7.2 // indirect
 	github.com/gobuffalo/packr/v2 v2.8.1 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/gorilla/websocket v1.4.2
 	github.com/imkira/go-interpol v1.1.0 // indirect
-	github.com/jinzhu/gorm v1.9.16
 	github.com/labstack/echo/v4 v4.3.0
 	github.com/sclevine/agouti v3.0.0+incompatible // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
-	github.com/thoas/go-funk v0.9.0 // indirect
 	github.com/v2fly/v2ray-core/v4 v4.40.1
 	github.com/valyala/fasthttp v1.28.0 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
@@ -26,6 +25,7 @@ require (
 	github.com/yudai/gojsondiff v1.0.0 // indirect
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/yudai/pp v2.0.1+incompatible // indirect
+	google.golang.org/protobuf v1.26.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gorm.io/driver/sqlite v1.1.4
 	gorm.io/gorm v1.21.11
