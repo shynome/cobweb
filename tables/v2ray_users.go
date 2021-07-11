@@ -84,7 +84,7 @@ func GetV2rayUsersTable(ctx *context.Context) table.Table {
 			return v2.AddUser(user)
 		} else if values.IsUpdatePost() {
 			var err error
-			if err = v2.AddUser(user); err != nil {
+			if err = v2.RemoveUser(user.Username); err != nil {
 				return err
 			}
 			if err = v2.AddUser(user); err != nil {
