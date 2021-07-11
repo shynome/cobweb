@@ -2,6 +2,7 @@ package tables
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 
 	_ "embed"
@@ -11,6 +12,7 @@ import (
 	form2 "github.com/GoAdminGroup/go-admin/plugins/admin/modules/form"
 	"github.com/GoAdminGroup/go-admin/plugins/admin/modules/table"
 	"github.com/GoAdminGroup/go-admin/template/types"
+	"github.com/GoAdminGroup/go-admin/template/types/action"
 	"github.com/GoAdminGroup/go-admin/template/types/form"
 	"github.com/shynome/cobweb/models"
 	"github.com/shynome/cobweb/v2ray"
@@ -51,6 +53,32 @@ func GetV2rayUsersTable(ctx *context.Context) table.Table {
 		})
 	info.AddField("Created_at", "created_at", db.Datetime)
 	info.AddField("Updated_at", "updated_at", db.Datetime)
+	info.AddField("禁用", "deleted_at", db.Datetime).
+		FieldDisplay(func(value types.FieldModel) interface{} {
+			if value.Value != "" {
+				return `<span style="color: gray">已禁用</span>`
+			}
+			return `<span style="color: green">正常</span>`
+		})
+	info.AddActionButton("禁用", action.Ajax("/v2ray_user/disable", func(ctx *context.Context) (success bool, msg string, data interface{}) {
+		orm := models.GetORM()
+		id := ctx.FormValue("id")
+		fmt.Println(id)
+		u := models.V2rayUser{}
+		if err := orm.Where("id", id).Delete(&u).Error; err != nil {
+			return false, "禁用失败", ""
+		}
+		return true, "禁用成功", ""
+	}))
+	info.AddActionButton("启用", action.Ajax("/v2ray_user/enable", func(ctx *context.Context) (success bool, msg string, data interface{}) {
+		orm := models.GetORM()
+		id := ctx.FormValue("id")
+		u := models.V2rayUser{}
+		if err := orm.Unscoped().Model(&u).Where("id", id).Update("deleted_at", nil).Error; err != nil {
+			return false, "启用失败", ""
+		}
+		return true, "启用成功", ""
+	}))
 
 	info.SetPreDeleteFn(func(ids []string) (err error) {
 		var users []models.V2rayUser
@@ -84,20 +112,26 @@ func GetV2rayUsersTable(ctx *context.Context) table.Table {
 		FieldNowWhenUpdate().
 		FieldNotAllowEdit()
 
-	formList.SetPostHook(func(values form2.Values) error {
-		user := models.V2rayUser{
-			Username: values.Get("username"),
-			Uuid:     values.Get("uuid"),
-		}
+	formList.SetPostHook(func(values form2.Values) (err error) {
 		if values.IsInsertPost() {
+			user := models.V2rayUser{
+				Username: values.Get("username"),
+				Uuid:     values.Get("uuid"),
+			}
 			return v2.AddUser(user)
 		} else if values.IsUpdatePost() {
-			var err error
-			if err = v2.RemoveUser(user.Username); err != nil {
-				return err
+			user := models.V2rayUser{}
+			if err = orm.Unscoped().Where("id", values.Get("id")).Find(&user).Error; err != nil {
+				return
+			}
+			// 删除有可能失败
+			_ = v2.RemoveUser(user.Username)
+			// 用户已被删除, 不用加回来了
+			if user.DeletedAt.Valid {
+				return
 			}
 			if err = v2.AddUser(user); err != nil {
-				return err
+				return
 			}
 		}
 		return nil
