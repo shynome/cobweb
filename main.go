@@ -13,6 +13,7 @@ import (
 	"github.com/GoAdminGroup/go-admin/engine"
 	"github.com/labstack/echo/v4"
 
+	"github.com/shynome/cobweb/config"
 	"github.com/shynome/cobweb/models"
 	"github.com/shynome/cobweb/pages"
 	"github.com/shynome/cobweb/tables"
@@ -27,7 +28,9 @@ func main() {
 func startServer() {
 	e := echo.New()
 
-	eng := engine.Default().AddConfigFromYAML("./config.yaml")
+	scfg := config.GetServerConfig()
+	cfg := config.Get()
+	eng := engine.Default().AddConfig(cfg)
 	models.Init(eng.SqliteConnection())
 
 	orm := models.GetORM()
@@ -39,7 +42,7 @@ func startServer() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	e.Any("/ray", func(c echo.Context) error {
+	e.Any(scfg.V2rayUrl, func(c echo.Context) error {
 		ws.ServerHTTP(c.Response().Writer, c.Request())
 		return nil
 	})
@@ -50,9 +53,9 @@ func startServer() {
 		Use(e); err != nil {
 		panic(err)
 	}
-	eng.HTML("GET", "/admin", pages.GetDashBoard)
+	eng.HTML("GET", "/"+cfg.UrlPrefix, pages.GetDashBoard)
 
-	go func() { e.Logger.Fatal(e.Start(":3005")) }()
+	go func() { e.Logger.Fatal(e.Start(scfg.Listen)) }()
 	go func() {
 		if err := v2.Server.Start(); err != nil {
 			log.Fatal(err)
