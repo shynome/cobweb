@@ -3,6 +3,7 @@ package share
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -12,7 +13,8 @@ import (
 )
 
 type Params struct {
-	UUID string `form:"uuid"`
+	UUID   string `form:"uuid"`
+	Remark string `form:"remark"`
 }
 
 func Register(g *echo.Group) {
@@ -22,7 +24,7 @@ func Register(g *echo.Group) {
 		if err = c.Bind(&params); err != nil {
 			return
 		}
-		link, err := genShareLink(c, params.UUID)
+		link, err := genShareLink(c, params)
 		if err != nil {
 			return
 		}
@@ -33,7 +35,7 @@ func Register(g *echo.Group) {
 		if err = c.Bind(&params); err != nil {
 			return
 		}
-		link, err := genShareLink(c, params.UUID)
+		link, err := genShareLink(c, params)
 		if err != nil {
 			return
 		}
@@ -50,7 +52,7 @@ func Register(g *echo.Group) {
 		if err = c.Bind(&params); err != nil {
 			return
 		}
-		vnext, err := genShareVNext(c, params.UUID)
+		vnext, err := genShareVNext(c, params)
 		if err != nil {
 			return
 		}
@@ -58,7 +60,10 @@ func Register(g *echo.Group) {
 	})
 }
 
-func genShareVNext(c echo.Context, uuid string) (VNEXT, error) {
+func genShareVNext(c echo.Context, p Params) (VNEXT, error) {
+	uuid := p.UUID
+	remark := p.Remark
+
 	cfg := config.GetV2rayConfig()
 	req := c.Request()
 	requ := strings.Split(req.Host, ":")
@@ -77,9 +82,21 @@ func genShareVNext(c echo.Context, uuid string) (VNEXT, error) {
 	}
 	path := cfg.UsePath
 	tls := cfg.UseTLS
+
+	var remarkPrefix string
+	if cfg.UseRemarkPrefix != "" {
+		remarkPrefix = cfg.UseRemarkPrefix
+	} else {
+		remarkPrefix = "ws"
+		tls = ""
+		if cfg.UseTLS == "tls" {
+			tls = "s"
+		}
+		remarkPrefix = fmt.Sprintf("ws%s://%s:%s", tls, domain, port)
+	}
 	vnext := VNEXT{
 		Version: "2",
-		Remark:  "",
+		Remark:  remarkPrefix + " - " + remark,
 		Address: domain,
 		Port:    port,
 		ID:      uuid,
@@ -93,8 +110,8 @@ func genShareVNext(c echo.Context, uuid string) (VNEXT, error) {
 	return vnext, nil
 }
 
-func genShareLink(c echo.Context, uuid string) (string, error) {
-	vnext, err := genShareVNext(c, uuid)
+func genShareLink(c echo.Context, p Params) (string, error) {
+	vnext, err := genShareVNext(c, p)
 	if err != nil {
 		return "", err
 	}

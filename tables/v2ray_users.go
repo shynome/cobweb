@@ -33,10 +33,18 @@ func GetV2rayUsersTable(ctx *context.Context) table.Table {
 	info.AddField("Id", "id", db.Integer).
 		FieldFilterable()
 	info.AddField("Username", "username", db.Text)
+	info.AddField("备注", "remark", db.Text)
 	info.AddField("Uuid", "uuid", db.Text).
 		FieldDisplay(func(value types.FieldModel) interface{} {
 			var tpl bytes.Buffer
-			if err := shareCol.Execute(&tpl, map[string]string{"uuid": value.Value}); err != nil {
+			remark := value.Row["remark"].(string)
+			if remark == "" {
+				remark = value.Row["username"].(string)
+			}
+			if err := shareCol.Execute(&tpl, map[string]string{
+				"uuid":   value.Value,
+				"remark": remark,
+			}); err != nil {
 				return err
 			}
 			return tpl.String()
@@ -67,6 +75,7 @@ func GetV2rayUsersTable(ctx *context.Context) table.Table {
 	formList.AddField("Uuid", "uuid", db.Text, form.Text).
 		FieldMust().
 		FieldDefault(_uuid.String())
+	formList.AddField("remark", "remark", db.Text, form.Text)
 	formList.AddField("Created_at", "created_at", db.Datetime, form.Datetime).
 		FieldNowWhenInsert().
 		FieldNotAllowEdit()
@@ -84,7 +93,7 @@ func GetV2rayUsersTable(ctx *context.Context) table.Table {
 			return v2.AddUser(user)
 		} else if values.IsUpdatePost() {
 			var err error
-			if err = v2.AddUser(user); err != nil {
+			if err = v2.RemoveUser(user.Username); err != nil {
 				return err
 			}
 			if err = v2.AddUser(user); err != nil {
