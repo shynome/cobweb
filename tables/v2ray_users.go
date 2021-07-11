@@ -33,6 +33,7 @@ func GetV2rayUsersTable(ctx *context.Context) table.Table {
 	info.AddField("Id", "id", db.Integer).
 		FieldFilterable()
 	info.AddField("Username", "username", db.Text)
+	info.AddField("备注", "remark", db.Text)
 	info.AddField("Uuid", "uuid", db.Text).
 		FieldDisplay(func(value types.FieldModel) interface{} {
 			var tpl bytes.Buffer
@@ -67,6 +68,7 @@ func GetV2rayUsersTable(ctx *context.Context) table.Table {
 	formList.AddField("Uuid", "uuid", db.Text, form.Text).
 		FieldMust().
 		FieldDefault(_uuid.String())
+	formList.AddField("remark", "remark", db.Text, form.Text)
 	formList.AddField("Created_at", "created_at", db.Datetime, form.Datetime).
 		FieldNowWhenInsert().
 		FieldNotAllowEdit()
