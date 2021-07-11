@@ -13,8 +13,8 @@ docker run -d --restart always -v $PWD/v2ray:/app/data -p 3005:3005 shynome/cobw
 ```
 
 管理界面: http://127.0.0.1:3005/admin/info/v2ray_users
-默认账号: amdin
-默认密码: amdin
+默认账号: admin
+默认密码: admin
 
 # 进阶使用
 
