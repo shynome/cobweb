@@ -37,7 +37,14 @@ func GetV2rayUsersTable(ctx *context.Context) table.Table {
 	info.AddField("Uuid", "uuid", db.Text).
 		FieldDisplay(func(value types.FieldModel) interface{} {
 			var tpl bytes.Buffer
-			if err := shareCol.Execute(&tpl, map[string]string{"uuid": value.Value}); err != nil {
+			remark := value.Row["remark"].(string)
+			if remark == "" {
+				remark = value.Row["username"].(string)
+			}
+			if err := shareCol.Execute(&tpl, map[string]string{
+				"uuid":   value.Value,
+				"remark": remark,
+			}); err != nil {
 				return err
 			}
 			return tpl.String()
