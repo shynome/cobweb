@@ -31,6 +31,9 @@ func startServer() {
 
 	scfg := config.GetServerConfig()
 	cfg := config.Get()
+	if err := initDB(cfg); err != nil {
+		log.Fatal(err)
+	}
 	eng := engine.Default().AddConfig(cfg)
 	models.Init(eng.SqliteConnection())
 
