@@ -2,7 +2,7 @@ FROM golang:1.16.3-alpine as Build
 RUN apk add --no-cache git build-base
 WORKDIR /app
 COPY . /app/
-RUN go build -mod=vendor -o cobweb
+RUN go build -mod=vendor -ldflags "-s -w" -o cobweb
 
 FROM alpine:3.9.4
 WORKDIR /app
